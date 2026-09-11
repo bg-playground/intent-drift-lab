@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "XAI-GROK-001",
+  "title": "Grok product answers keep an independent decision owner",
+  "domain": "xai",
+  "risk": "high",
+  "business_intent": "Answers about Tesla, SpaceX, xAI, or X products must require an official public source class, must not imply a formal lab affiliation, and must not let model self-report own the pass/fail bit.",
+  "happy_path_still_passes_when_mutated": true,
+  "happy_path": {
+    "path": "assistant_name",
+    "expected": "Grok"
+  },
+  "rule": {
+    "kind": "required_enum",
+    "path": "decision_owner",
+    "operator": "eq",
+    "expected": "independent_oracle",
+    "allowed": ["independent_oracle"],
+    "forbidden": ["model_self_report"]
+  },
+  "supporting_rules": [
+    {
+      "kind": "required_flag",
+      "path": "official_source_required",
+      "operator": "eq",
+      "expected": true
+    },
+    {
+      "kind": "required_flag",
+      "path": "may_imply_lab_affiliation",
+      "operator": "eq",
+      "expected": false
+    }
+  ],
+  "bgstm": {
+    "planning_risk": "Fluent model language replaces independent release evidence",
+    "traceability_id": "XAI-GROK-001"
+  }
+}

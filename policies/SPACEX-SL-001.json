@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "SPACEX-SL-001",
+  "title": "AviationLink may ship only at the frozen availability floor",
+  "domain": "spacex",
+  "risk": "high",
+  "business_intent": "Aviation-style connectivity may be offered only while the published availability floor stays at or above 99.90 percent and p99 handoff latency stays at or below 40 milliseconds.",
+  "happy_path_still_passes_when_mutated": true,
+  "happy_path": {
+    "path": "service_name",
+    "expected": "AviationLink"
+  },
+  "rule": {
+    "kind": "numeric_threshold",
+    "path": "availability_pct_min",
+    "operator": ">=",
+    "expected": 99.9
+  },
+  "supporting_rules": [
+    {
+      "kind": "numeric_threshold",
+      "path": "handoff_latency_ms_p99_max",
+      "operator": "<=",
+      "expected": 40
+    },
+    {
+      "kind": "required_flag",
+      "path": "crew_override_required",
+      "operator": "eq",
+      "expected": true
+    }
+  ],
+  "bgstm": {
+    "planning_risk": "Connectivity thresholds weaken while the service name stays the same",
+    "traceability_id": "SPACEX-SL-001"
+  }
+}

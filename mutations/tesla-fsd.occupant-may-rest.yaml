@@ -1,0 +1,5 @@
+# Lab analog. Valid document, drifted supervision qualifier.
+product_name: FSD
+supervision_mode: occupant_may_rest
+attention_required: false
+hardware_minimum: ai4

@@ -1,0 +1,5 @@
+# Lab analog. Not official Tesla policy.
+product_name: FSD
+supervision_mode: supervised
+attention_required: true
+hardware_minimum: ai4

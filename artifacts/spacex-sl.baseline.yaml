@@ -1,0 +1,5 @@
+# Lab analog. Not official SpaceX or Starlink policy.
+service_name: AviationLink
+availability_pct_min: 99.90
+handoff_latency_ms_p99_max: 40
+crew_override_required: true

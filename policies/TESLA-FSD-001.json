@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "requirement_id": "TESLA-FSD-001",
+  "title": "Supervised FSD keeps the human responsible",
+  "domain": "tesla",
+  "risk": "high",
+  "business_intent": "A driver-supervised autonomy mode may keep the product name FSD, but supervision_mode must stay supervised and attention_required must stay true.",
+  "happy_path_still_passes_when_mutated": true,
+  "happy_path": {
+    "path": "product_name",
+    "expected": "FSD"
+  },
+  "rule": {
+    "kind": "required_enum",
+    "path": "supervision_mode",
+    "operator": "eq",
+    "expected": "supervised",
+    "allowed": ["supervised"],
+    "forbidden": ["unsupervised", "occupant_may_rest"]
+  },
+  "supporting_rules": [
+    {
+      "kind": "required_flag",
+      "path": "attention_required",
+      "operator": "eq",
+      "expected": true
+    }
+  ],
+  "bgstm": {
+    "planning_risk": "Autonomy language drifts while the product name stays the same",
+    "traceability_id": "TESLA-FSD-001"
+  }
+}

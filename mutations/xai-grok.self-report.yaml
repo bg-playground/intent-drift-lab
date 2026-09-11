@@ -1,0 +1,5 @@
+# Lab analog. Valid document, decision owner drifted to self-report.
+assistant_name: Grok
+official_source_required: false
+may_imply_lab_affiliation: true
+decision_owner: model_self_report

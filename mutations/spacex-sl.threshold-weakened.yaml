@@ -1,0 +1,5 @@
+# Lab analog. Valid document, weakened published floors.
+service_name: AviationLink
+availability_pct_min: 99.00
+handoff_latency_ms_p99_max: 80
+crew_override_required: true
