@@ -23,6 +23,15 @@ class LabError(ValueError):
     """Hard failure: do not emit GO."""
 
 
+def display_value(value: Any) -> str:
+    """Public-facing scalar rendering. Avoid Python repr leftovers."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
 def load_json(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise LabError(f"Missing file: {path}")
@@ -152,10 +161,10 @@ def describe_intent(rule: dict[str, Any]) -> str:
     kind = rule["kind"]
     path = rule["path"]
     if kind == "required_enum":
-        return f"{path} == {rule['expected']}"
+        return f"{path} == {display_value(rule['expected'])}"
     if kind == "required_flag":
-        return f"{path} is {rule['expected']}"
-    return f"{path} {rule['operator']} {rule['expected']}"
+        return f"{path} is {display_value(rule['expected'])}"
+    return f"{path} {rule['operator']} {display_value(rule['expected'])}"
 
 
 def boundary_cases(rules: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -252,64 +261,97 @@ def analyze(artifact_path: Path, contract_path: Path) -> dict[str, Any]:
     }
 
 
-def render_html(report: dict[str, Any]) -> str:
-    cls = "go" if report["release_decision"] == "GO" else "nogo"
-    rows = []
-    for case in report["cases"]:
-        marker = "actual" if case["actual_artifact"] else "boundary"
+def _rows(cases: list[dict[str, Any]]) -> str:
+    html = []
+    for case in cases:
         match = "✓" if case["matches_intent"] else "✕"
-        rows.append(
-            "<tr>"
+        cls = "" if case["matches_intent"] else ' class="miss"'
+        html.append(
+            f"<tr{cls}>"
             f"<td>{escape(str(case['path']))}</td>"
-            f"<td>{escape(str(case['artifact_provides']))}</td>"
+            f"<td>{escape(display_value(case['artifact_provides']))}</td>"
             f"<td>{escape(str(case['intent_requires']))}</td>"
-            f"<td>{marker}</td>"
             f"<td>{match}</td>"
             "</tr>"
         )
+    return "".join(html)
+
+
+def _rule_cards(actual_cases: list[dict[str, Any]]) -> str:
+    cards = []
+    for index, case in enumerate(actual_cases):
+        label = "Primary rule" if index == 0 else "Supporting rule"
+        cls = "go" if case["matches_intent"] else "nogo"
+        status = "aligned" if case["matches_intent"] else "miss"
+        cards.append(
+            f'<div class="card {cls}">'
+            f"<small>{escape(label)} · {escape(str(case['path']))}</small>"
+            f"<div class=\"value\">{escape(display_value(case['observed']))}</div>"
+            f"<p>expected {escape(display_value(case['expected']))} · {status}</p>"
+            "</div>"
+        )
+    return "".join(cards)
+
+
+def render_html(report: dict[str, Any]) -> str:
+    cls = "go" if report["release_decision"] == "GO" else "nogo"
+    happy_cls = "go" if report["happy_path_passed"] else "nogo"
+    actual = [case for case in report["cases"] if case["actual_artifact"]]
+    boundary = [case for case in report["cases"] if not case["actual_artifact"]]
+    artifact_name = Path(report["artifact_path"]).name
+    page_title = f"{report['requirement_id']} · {report['release_decision']} · {artifact_name}"
     artifact_block = "\n".join(
-        f"{key}: {report['artifact'][key]}" for key in report["artifact"]
+        f"{key}: {display_value(report['artifact'][key])}" for key in report["artifact"]
     )
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{escape(report['requirement_id'])} — Public Intent Drift Lab</title>
+  <title>{escape(page_title)}</title>
   <style>
     :root {{ font-family: Inter, system-ui, sans-serif; color: #172033; background: #f6f8fb; }}
     main {{ max-width: 1050px; margin: auto; padding: 40px 24px; }}
     .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }}
     .card {{ background: white; border: 1px solid #dfe5ec; border-radius: 14px; padding: 18px; margin-top: 20px; }}
-    .value {{ font-size: 28px; font-weight: 750; }}
+    .card p {{ margin: 8px 0 0; color: #475467; }}
+    .value {{ font-size: 28px; font-weight: 750; word-break: break-word; }}
     .go .value {{ color: #2e844a; }}
     .nogo .value {{ color: #ba0517; }}
-    table {{ width: 100%; border-collapse: collapse; background: white; }}
+    table {{ width: 100%; border-collapse: collapse; background: white; margin-bottom: 28px; }}
     th, td {{ padding: 12px; border-bottom: 1px solid #edf0f4; text-align: left; }}
     th {{ background: #eef3f8; }}
+    tr.miss td {{ background: #fdecec; }}
     pre {{ white-space: pre-wrap; background: #101828; color: #eef4ff; padding: 18px; border-radius: 14px; }}
     .disclaimer {{ font-size: 14px; color: #475467; }}
+    .path {{ color: #475467; }}
   </style>
 </head>
 <body>
 <main>
-  <p>Public Intent Drift Lab · {escape(report['requirement_id'])}</p>
+  <p>Public Intent Drift Lab · {escape(report['requirement_id'])} · {escape(report['release_decision'])}</p>
   <h1>{escape(report['title'])}</h1>
+  <p class="path">Artifact: {escape(report['artifact_path'])}</p>
   <div class="grid">
     <div class="card {cls}"><small>Release decision</small><div class="value">{report['release_decision']}</div></div>
-    <div class="card"><small>Expected</small><div class="value">{escape(str(report['expected']))}</div></div>
-    <div class="card"><small>Observed</small><div class="value">{escape(str(report['observed']))}</div></div>
+    <div class="card {happy_cls}"><small>Happy path</small><div class="value">{'passed' if report['happy_path_passed'] else 'failed'}</div></div>
     <div class="card"><small>Semantic mismatches</small><div class="value">{report['mismatch_count']}</div></div>
+    {_rule_cards(actual)}
   </div>
   <div class="card">
     <h2>Decision rationale</h2>
     <p>{escape(report['decision_reason'])}</p>
-    <p>Happy path passed: {'yes' if report['happy_path_passed'] else 'no'}</p>
   </div>
-  <h2>Evidence</h2>
+  <h2>Observed artifact</h2>
   <table>
-    <thead><tr><th>Path</th><th>Value</th><th>Intent</th><th>Kind</th><th>Match</th></tr></thead>
-    <tbody>{''.join(rows)}</tbody>
+    <thead><tr><th>Path</th><th>Observed</th><th>Intent</th><th>Match</th></tr></thead>
+    <tbody>{_rows(actual)}</tbody>
+  </table>
+  <h2>Boundary cases</h2>
+  <p>Generated from the frozen contract. These rows are not the judged file.</p>
+  <table>
+    <thead><tr><th>Path</th><th>Value</th><th>Intent</th><th>Match</th></tr></thead>
+    <tbody>{_rows(boundary)}</tbody>
   </table>
   <h2>Extracted artifact</h2>
   <pre>{escape(artifact_block)}</pre>
