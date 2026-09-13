@@ -286,7 +286,7 @@ def _rule_cards(actual_cases: list[dict[str, Any]]) -> str:
         cards.append(
             f'<div class="card {cls}">'
             f"<small>{escape(label)} · {escape(str(case['path']))}</small>"
-            f"<div class=\"value\">{escape(display_value(case['observed']))}</div>"
+            f'<div class="value">{escape(display_value(case["observed"]))}</div>'
             f"<p>expected {escape(display_value(case['expected']))} · {status}</p>"
             "</div>"
         )
