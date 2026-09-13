@@ -145,6 +145,50 @@ class DriftLabTests(unittest.TestCase):
             self.assertIn(drift_lab.DISCLAIMER, html)
             self.assertNotIn("artifact", payload)
 
+    def test_html_reviewer_layout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            mutant_html = Path(tmp) / "mutant.html"
+            baseline_html = Path(tmp) / "baseline.html"
+            self.assertEqual(
+                drift_lab.main(
+                    [
+                        "--artifact",
+                        str(ROOT / "mutations" / "tesla-fsd.occupant-may-rest.yaml"),
+                        "--contract",
+                        str(ROOT / "policies" / "TESLA-FSD-001.json"),
+                        "--html-out",
+                        str(mutant_html),
+                    ]
+                ),
+                2,
+            )
+            self.assertEqual(
+                drift_lab.main(
+                    [
+                        "--artifact",
+                        str(ROOT / "artifacts" / "tesla-fsd.baseline.yaml"),
+                        "--contract",
+                        str(ROOT / "policies" / "TESLA-FSD-001.json"),
+                        "--html-out",
+                        str(baseline_html),
+                    ]
+                ),
+                0,
+            )
+            mutant = mutant_html.read_text(encoding="utf-8")
+            baseline = baseline_html.read_text(encoding="utf-8")
+            self.assertIn("TESLA-FSD-001 · NO-GO · tesla-fsd.occupant-may-rest.yaml", mutant)
+            self.assertIn("TESLA-FSD-001 · GO · tesla-fsd.baseline.yaml", baseline)
+            self.assertIn("Observed artifact", mutant)
+            self.assertIn("Boundary cases", mutant)
+            self.assertIn("Happy path", mutant)
+            self.assertIn("Supporting rule", mutant)
+            self.assertIn("attention_required", mutant)
+            self.assertIn("true", baseline.lower())
+            self.assertNotIn("True", baseline)
+            self.assertNotIn("False", mutant)
+            self.assertIn('class="miss"', mutant)
+
 
 if __name__ == "__main__":
     unittest.main()
