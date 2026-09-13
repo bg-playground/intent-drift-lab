@@ -32,11 +32,22 @@ The implementation does not grade itself. The policy contract is the oracle.
 
 ## 60-second demo
 
+macOS / Linux:
+
 ```bash
 git clone https://github.com/bg-playground/intent-drift-lab.git
 cd intent-drift-lab
 python3 -m unittest discover -s tests -v
 bash scripts/run-demo.sh
+```
+
+Windows PowerShell (no WSL or bash required):
+
+```powershell
+git clone https://github.com/bg-playground/intent-drift-lab.git
+cd intent-drift-lab
+python -m unittest discover -s tests -v
+powershell -ExecutionPolicy Bypass -File scripts/run-demo.ps1
 ```
 
 No third-party packages. No API keys. No network.
@@ -67,18 +78,11 @@ These are lab analogs. They use recognizable product vocabulary so the failure m
 ## One fixture by hand
 
 ```bash
-python3 tools/drift_lab.py \
-  --artifact artifacts/tesla-fsd.baseline.yaml \
-  --contract policies/TESLA-FSD-001.json \
-  --json-out evidence/tesla-baseline.json \
-  --html-out evidence/tesla-baseline.html
-
-python3 tools/drift_lab.py \
-  --artifact mutations/tesla-fsd.occupant-may-rest.yaml \
-  --contract policies/TESLA-FSD-001.json \
-  --json-out evidence/tesla-mutation.json \
-  --html-out evidence/tesla-mutation.html
+python3 tools/drift_lab.py --artifact artifacts/tesla-fsd.baseline.yaml --contract policies/TESLA-FSD-001.json --json-out evidence/tesla-baseline.json --html-out evidence/tesla-baseline.html
+python3 tools/drift_lab.py --artifact mutations/tesla-fsd.occupant-may-rest.yaml --contract policies/TESLA-FSD-001.json --json-out evidence/tesla-mutation.json --html-out evidence/tesla-mutation.html
 ```
+
+On Windows, use `python` instead of `python3` if that is the command on your PATH.
 
 ## BGSTM mapping
 
