@@ -32,12 +32,14 @@ The implementation does not grade itself. The policy contract is the oracle.
 
 ## 60-second demo
 
+Run these from the repo root (`intent-drift-lab`), not from `evidence/`.
+
 macOS / Linux:
 
 ```bash
 git clone https://github.com/bg-playground/intent-drift-lab.git
 cd intent-drift-lab
-python3 -m unittest discover -s tests -v
+python3 -m unittest tests.test_drift_lab -v
 bash scripts/run-demo.sh
 ```
 
@@ -46,7 +48,7 @@ Windows PowerShell (no WSL or bash required):
 ```powershell
 git clone https://github.com/bg-playground/intent-drift-lab.git
 cd intent-drift-lab
-python -m unittest discover -s tests -v
+python -m unittest tests.test_drift_lab -v
 powershell -ExecutionPolicy Bypass -File scripts/run-demo.ps1
 ```
 
