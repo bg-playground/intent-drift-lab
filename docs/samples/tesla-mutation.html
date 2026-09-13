@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TESLA-FSD-001 · NO-GO · tesla-fsd.occupant-may-rest.yaml</title>
+  <style>
+    :root { font-family: Inter, system-ui, sans-serif; color: #172033; background: #f6f8fb; }
+    main { max-width: 1050px; margin: auto; padding: 40px 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+    .card { background: white; border: 1px solid #dfe5ec; border-radius: 14px; padding: 18px; margin-top: 20px; }
+    .card p { margin: 8px 0 0; color: #475467; }
+    .value { font-size: 28px; font-weight: 750; word-break: break-word; }
+    .go .value { color: #2e844a; }
+    .nogo .value { color: #ba0517; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 28px; }
+    th, td { padding: 12px; border-bottom: 1px solid #edf0f4; text-align: left; }
+    th { background: #eef3f8; }
+    tr.miss td { background: #fdecec; }
+    pre { white-space: pre-wrap; background: #101828; color: #eef4ff; padding: 18px; border-radius: 14px; }
+    .disclaimer { font-size: 14px; color: #475467; }
+    .path { color: #475467; }
+  </style>
+</head>
+<body>
+<main>
+  <p>Public Intent Drift Lab · TESLA-FSD-001 · NO-GO</p>
+  <h1>Supervised FSD keeps the human responsible</h1>
+  <p class="path">Artifact: mutations/tesla-fsd.occupant-may-rest.yaml</p>
+  <div class="grid">
+    <div class="card nogo"><small>Release decision</small><div class="value">NO-GO</div></div>
+    <div class="card go"><small>Happy path</small><div class="value">passed</div></div>
+    <div class="card"><small>Semantic mismatches</small><div class="value">2</div></div>
+    <div class="card nogo"><small>Primary rule · supervision_mode</small><div class="value">occupant_may_rest</div><p>expected supervised · miss</p></div><div class="card nogo"><small>Supporting rule · attention_required</small><div class="value">false</div><p>expected true · miss</p></div>
+  </div>
+  <div class="card">
+    <h2>Decision rationale</h2>
+    <p>Artifact is still valid on the happy path, but at least one frozen intent rule drifted.</p>
+  </div>
+  <h2>Observed artifact</h2>
+  <table>
+    <thead><tr><th>Path</th><th>Observed</th><th>Intent</th><th>Match</th></tr></thead>
+    <tbody><tr class="miss"><td>supervision_mode</td><td>occupant_may_rest</td><td>supervision_mode == supervised</td><td>✕</td></tr><tr class="miss"><td>attention_required</td><td>false</td><td>attention_required is true</td><td>✕</td></tr></tbody>
+  </table>
+  <h2>Boundary cases</h2>
+  <p>Generated from the frozen contract. These rows are not the judged file.</p>
+  <table>
+    <thead><tr><th>Path</th><th>Value</th><th>Intent</th><th>Match</th></tr></thead>
+    <tbody><tr><td>supervision_mode</td><td>supervised</td><td>supervision_mode == supervised</td><td>✓</td></tr><tr class="miss"><td>supervision_mode</td><td>unsupervised</td><td>supervision_mode == supervised</td><td>✕</td></tr><tr class="miss"><td>supervision_mode</td><td>occupant_may_rest</td><td>supervision_mode == supervised</td><td>✕</td></tr><tr><td>attention_required</td><td>true</td><td>attention_required is true</td><td>✓</td></tr><tr class="miss"><td>attention_required</td><td>false</td><td>attention_required is true</td><td>✕</td></tr></tbody>
+  </table>
+  <h2>Extracted artifact</h2>
+  <pre>product_name: FSD
+supervision_mode: occupant_may_rest
+attention_required: false
+hardware_minimum: ai4</pre>
+  <div class="card disclaimer"><p>This repository is an independent demonstration of intent-aware testing. It is not affiliated with Tesla, SpaceX, xAI, or X. Fixtures are lab analogs. Reports are not product certifications, safety cases, or launch-readiness evidence.</p></div>
+</main>
+</body>
+</html>

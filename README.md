@@ -1,6 +1,24 @@
 # Public Intent Drift Lab
 
-> Test whether a public-style product claim still means what it used to mean — not whether the document still parses.
+The document still parses. The product name is unchanged. The operating rule moved.
+
+This lab freezes a public-style claim as a contract and issues a deterministic **GO / NO-GO**. The happy path can stay green. The oracle still fails the mutant.
+
+**Tesla analog, same product name:**
+
+- [Baseline · GO](docs/samples/tesla-baseline.html) — `supervision_mode` is still `supervised`
+- [Mutant · NO-GO](docs/samples/tesla-mutation.html) — name is still `FSD`, qualifier drifted to `occupant_may_rest`, happy path passed
+
+Open those two files locally after clone. GitHub shows the HTML source; the rendered pack is the evidence.
+
+| Fixture | Artifact | Decision |
+|---|---|---|
+| TESLA-FSD-001 | baseline | **GO** |
+| TESLA-FSD-001 | mutant | **NO-GO** |
+| SPACEX-SL-001 | baseline | **GO** |
+| SPACEX-SL-001 | mutant | **NO-GO** |
+| XAI-GROK-001 | baseline | **GO** |
+| XAI-GROK-001 | mutant | **NO-GO** |
 
 This repository is an independent demonstration of intent-aware testing. It is not affiliated with Tesla, SpaceX, xAI, or X. Fixtures are lab analogs. Reports are not product certifications, safety cases, or launch-readiness evidence.
 
@@ -9,8 +27,6 @@ Sister lab: [salesforce-change-impact-lab](https://github.com/bg-playground/sale
 ## Why this exists
 
 Typical demos ask whether a page still loads, a spec still parses, or a model still sounds fluent. Those checks can stay green after the operating rule silently moved.
-
-Public Intent Drift Lab freezes a claim as a contract, reads a current artifact, and issues a deterministic **GO / NO-GO** with BGSTM-style evidence.
 
 ```text
 Frozen public intent
@@ -54,17 +70,6 @@ powershell -ExecutionPolicy Bypass -File scripts/run-demo.ps1
 
 No third-party packages. No API keys. No network.
 
-Expected demo table:
-
-| Fixture | Artifact | Decision |
-|---|---|---|
-| TESLA-FSD-001 | baseline | **GO** |
-| TESLA-FSD-001 | mutant | **NO-GO** |
-| SPACEX-SL-001 | baseline | **GO** |
-| SPACEX-SL-001 | mutant | **NO-GO** |
-| XAI-GROK-001 | baseline | **GO** |
-| XAI-GROK-001 | mutant | **NO-GO** |
-
 The mutant command exits `2`. A missing file or unknown rule kind exits `1` and never emits GO.
 
 ## The three fixtures
@@ -100,13 +105,14 @@ On Windows, use `python` instead of `python3` if that is the command on your PAT
 ## Repository map
 
 ```text
-policies/     Frozen intent contracts
-artifacts/    Baseline public-style artifacts
-mutations/    Valid artifacts with silent semantic drift
-tools/        Deterministic evidence runner
-tests/        Offline regression tests for the lab itself
-docs/         Architecture, BGSTM mapping, disclaimer
-evidence/     Generated reports (local only)
+policies/      Frozen intent contracts
+artifacts/     Baseline public-style artifacts
+mutations/     Valid artifacts with silent semantic drift
+tools/         Deterministic evidence runner
+tests/         Offline regression tests for the lab itself
+docs/samples/  Checked-in Tesla GO / NO-GO evidence packs
+docs/          Architecture, BGSTM mapping, disclaimer
+evidence/      Generated reports (local only)
 ```
 
 ## What v1 is not
